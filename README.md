@@ -239,7 +239,7 @@ For now, this API only supports "available claims". For more on this, see the [d
     }
   ],
   "net": "TestNet",
-  "past_claims": [],
+  "total_unspent_claim": [],
   "total_claim": 24928
 }
 ```
