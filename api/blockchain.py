@@ -62,7 +62,9 @@ def storeBlockInDB(block_index, nodeAPI=False):
     success, total_sys, total_net = storeBlockTransactions(block_data)
     if success:
         lastBlock = blockchain_db['blockchain'].find_one({"index": block_data["index"]-1})
-        print(lastBlock)
+        # Comment out below to see the last block, but ojo!, block 0 has some Chinese characters
+        # So make sure your terminal is set to display UTF-8 characters.
+        # print(lastBlock)
         if lastBlock and 'sys_fee' in lastBlock and 'net_fee' in lastBlock:
             block_data['sys_fee'] = lastBlock['sys_fee'] + total_sys
             block_data['net_fee'] = lastBlock['net_fee'] + total_net
@@ -93,19 +95,24 @@ def storeBlockTransactions(block):
         total_net += t['net_fee']
         if 'vin' in t: #t['type'] == 'ContractTransaction':
             input_transaction_data = []
-            for vin in t['vin']:
-                vin['txid'] = convert_txid(vin['txid'])
-                try:
-                    print("trying...")
-                    lookup_t = blockchain_db['transactions'].find_one({"txid": vin['txid']})
-                    # print(lookup_t)
-                    input_transaction_data.append(lookup_t['vout'][vin['vout']])
-                    # print(input_transaction_data)
-                    input_transaction_data[-1]['txid'] = vin['txid']
-                except:
-                    print("failed on transaction lookup")
-                    # print(vin['txid'])
-                    return False
+
+            # Below we're going to verify that the input transaction (vin) exists in the database
+            # If it doesn't exist, we can't add the transaction
+            # If there is block 0, we skip this check because there's no vins
+            if block["index"] > 0:
+                for vin in t['vin']:
+                    vin['txid'] = convert_txid(vin['txid'])
+                    try:
+                        print("trying...")
+                        lookup_t = blockchain_db['transactions'].find_one({"txid": vin['txid']})
+                        # print(lookup_t)
+                        input_transaction_data.append(lookup_t['vout'][vin['vout']])
+                        # print(input_transaction_data)
+                        input_transaction_data[-1]['txid'] = vin['txid']
+                    except:
+                        print("failed on transaction lookup")
+                        # print(vin['txid'])
+                        return False, None, None
             t['vin_verbose'] = input_transaction_data
         if 'claims' in t:
             claim_transaction_data = []

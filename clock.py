@@ -22,12 +22,18 @@ def pollNode():
 def syncBlockchain():
     nodeAPI = get_highest_node()
     currBlock = getBlockCount(nodeAPI)["result"]
-    lastTrustedBlock = blockchain_db["meta"].find_one({"name":"lastTrustedBlock"})["value"]
-    laterBlocks = set([block["index"] for block in blockchain_db["blockchain"].find({"index": {"$gt": lastTrustedBlock}})])
+    lastTrustedBlockMeta = blockchain_db["meta"].find_one({"name":"lastTrustedBlock"})
+
+    nextBlock = 0
+    if lastTrustedBlockMeta:
+        nextBlock = lastTrustedBlockMeta["value"] + 1
+
+    laterBlocks = set([block["index"] for block in blockchain_db["blockchain"].find({"index": {"$gte": nextBlock}})])
     hash_set = {x:x for x in laterBlocks}
-    newLastTrusted = lastTrustedBlock
+
     stopTrust = False
-    for i in range(lastTrustedBlock+1, currBlock):
+    newLastTrusted = None
+    for i in range(nextBlock, currBlock):
         if not i in hash_set:
             print("repairing {}".format(i))
             q.enqueue(storeBlockInDB, i, nodeAPI)
@@ -35,7 +41,9 @@ def syncBlockchain():
         if not stopTrust:
             newLastTrusted = i
     print("newLastTrusted", newLastTrusted)
-    blockchain_db['meta'].update_one({"name":"lastTrustedBlock"}, {"$set": {"value": newLastTrusted}}, upsert=True)
+
+    if newLastTrusted is not None:
+        blockchain_db['meta'].update_one({"name":"lastTrustedBlock"}, {"$set": {"value": newLastTrusted}}, upsert=True)
     print("done")
 
 sched.start()
