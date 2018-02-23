@@ -69,7 +69,7 @@ Also add to your bash profile `export NET=TestNet` or `export NET=MainNet`, depe
 
 Don't forget to run `source ~/.bash_profile` upon saving.
 
-## Syncing Mongo'
+## Syncing Mongo
 
 ### Queuing Import Jobs
 
