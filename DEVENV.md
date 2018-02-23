@@ -76,7 +76,7 @@ Don't forget to run `source ~/.bash_profile` upon saving.
 Run `python clock.py` from repo root. This will queue jobs through redis queue that copy blocks into your local mongodb. Wait a while until you see `repairing` followed by a final `done`, and then exit with `ctrl+c`.
 
 
-### Run Import Jobs
+### Running Import Jobs
 
 Run `python worker.py` from repo root. This will take a while...
 
