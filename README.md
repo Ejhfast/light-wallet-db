@@ -14,6 +14,9 @@ This API and a MongoDB mirror of the Neo blockchain live on Heroku. The public A
 
 All APIs work on both MainNet (https://api.neonwallet.com) and TestNet (https://testnet-api.neonwallet.com).
 
+## Local Dev Environment Setup
+For the purpose of testing contributions to this repo, [refer to developer environment setup here](DEVENV.md)
+
 ### Balance data
 
 Given an address, return the current balance of NEO and GAS, as well as a list of transaction ids and amounts for unspent assets: `https://api.neonwallet.com/v1/address/balance/{address}`. Knowing these unspent transaction ids is important for light wallets because [wallets need them to send assets](/docs/Overview.md)!

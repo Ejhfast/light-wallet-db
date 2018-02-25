@@ -22,7 +22,7 @@ def pollNode():
 def syncBlockchain():
     nodeAPI = get_highest_node()
     currBlock = getBlockCount(nodeAPI)["result"]
-    lastTrustedBlock = blockchain_db["meta"].find_one({"name":"lastTrustedBlock"})["value"]
+    lastTrustedBlock = int(blockchain_db["meta"].find_one({"name":"lastTrustedBlock"})["value"])
     laterBlocks = set([block["index"] for block in blockchain_db["blockchain"].find({"index": {"$gt": lastTrustedBlock}})])
     hash_set = {x:x for x in laterBlocks}
     newLastTrusted = lastTrustedBlock
