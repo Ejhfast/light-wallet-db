@@ -13,6 +13,13 @@ OTCGO_TESTNET = [node + ":" + str(TESTNET_PORT) for node in OTCGO_SEED_LIST]
 COZ_MAINNET = ["http://seed{}.cityofzion.io:8080".format(i) for i in [1,2,3,4,5]]
 COZ_TESTNET = ["http://test{}.cityofzion.io:8880".format(i) for i in [1,2,3,4,5]]
 
+PRIVATENET_SEEDS = [
+    "http://localhost:30333",
+    "http://localhost:30334",
+    "http://localhost:30335",
+    "http://localhost:30336",
+]
+
 MAINNET_SEEDS = NEO_MAINNET + OTCGO_MAINNET + COZ_MAINNET
 TESTNET_SEEDS = NEO_TESTNET + OTCGO_TESTNET + COZ_TESTNET
 

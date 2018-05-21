@@ -4,13 +4,13 @@ import sys
 import os
 from rq import Queue
 from .db import db as blockchain_db
-from .util import MAINNET_SEEDS, TESTNET_SEEDS
+from .util import MAINNET_SEEDS, TESTNET_SEEDS, PRIVATENET_SEEDS
 import time
 from .scripts import add_fees
 
-nodeAPI = os.environ.get('NODEAPI')
+nodeAPI = os.environ.get('NODEAPI', PRIVATENET_SEEDS[0])
 appName = os.environ.get('APPNAME')
-net = os.environ.get('NET')
+net = os.environ.get('NET', 'PrivNet')
 
 # helper for making node RPC request
 def rpcRequest(method, params, nodeAPI=nodeAPI):
@@ -28,8 +28,15 @@ def getBlockCount(nodeAPI=False):
     return rpcRequest("getblockcount", [], nodeAPI)
 
 def checkSeeds():
-    seed_list = MAINNET_SEEDS if net == "MainNet" else TESTNET_SEEDS
+    if net == "MainNet":
+        seed_list = MAINNET_SEEDS
+    elif net == "PrivNet":
+        seed_list = PRIVATENET_SEEDS
+    else:
+        seed_list = TESTNET_SEEDS
+
     seeds = []
+
     for test_rpc in seed_list:
         print(test_rpc)
         try:
@@ -142,3 +149,11 @@ def log_event_worker(data):
 
 def update_sys_fees():
     add_fees()
+
+
+def drop_db():
+    blockchain_db["transactions"].drop()
+    blockchain_db["meta"].drop()
+    blockchain_db["blockchain"].drop()
+    blockchain_db["logs"].drop()
+    blockchain_db["addresses"].drop()

@@ -1,7 +1,7 @@
 from apscheduler.schedulers.blocking import BlockingScheduler
 from rq import Queue
 from api import redis_db as conn
-from api.blockchain import storeLatestBlockInDB, getBlockCount, blockchain_db, storeBlockInDB, checkSeeds, get_highest_node
+from api.blockchain import storeLatestBlockInDB, getBlockCount, blockchain_db, storeBlockInDB, checkSeeds, get_highest_node, drop_db
 
 q = Queue(connection=conn)
 
@@ -38,4 +38,30 @@ def syncBlockchain():
     blockchain_db['meta'].update_one({"name":"lastTrustedBlock"}, {"$set": {"value": newLastTrusted}}, upsert=True)
     print("done")
 
-sched.start()
+# sched.start()
+def str2bool(v):
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
+if __name__ == "__main__":
+
+    import argparse
+
+    parser = argparse.ArgumentParser("clock")
+    parser.add_argument("--init", help="True/False", type=str2bool)
+    args = parser.parse_args()
+
+    if args.init is True:
+        try:
+            drop_db()
+            checkSeeds()
+            blockchain_db["meta"].insert_one({"name": "lastTrustedBlock", "value": 0})
+        except Exception as e:
+            print(e)
+
+    sched.start()
