@@ -3,12 +3,15 @@ import os
 import redis
 from rq import Queue
 
-# MONGOUSER = os.environ.get('MONGOUSER', 'admin')
-# MONGOPASS = os.environ.get('MONGOPASS', 'admin')
-MONGOURL = os.environ.get('MONGOURL', '127.0.0.1:27017')
+MONGOUSER = os.environ.get('MONGOUSER')
+MONGOPASS = os.environ.get('MONGOPASS')
+MONGOURL = os.environ.get('MONGOURL')
 MONGOAPP = os.environ.get('MONGOAPP', 'neo')
-# MONGOURL = "mongodb://{}:{}@{}/{}".format(MONGOUSER, MONGOPASS, MONGOURL, MONGOAPP)
-MONGOURL = "mongodb://{}/{}".format(MONGOURL, MONGOAPP)
+
+if MONGOUSER and MONGOPASS:
+    MONGOURL = "mongodb://{}:{}@{}/{}".format(MONGOUSER, MONGOPASS, MONGOURL, MONGOAPP)
+else:
+    MONGOURL = "mongodb://{}/{}".format(MONGOURL, MONGOAPP)
 
 client = MongoClient(MONGOURL)
 db = client[MONGOAPP]
